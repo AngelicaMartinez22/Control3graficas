@@ -1,0 +1,121 @@
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ==========================================
+# 1. DATOS DE LA ACTIVIDAD
+# ==========================================
+
+n = np.arange(13)
+
+x = np.ones(13)
+
+y_real = np.array([
+    0.0000, 2.0000, 3.2000, 3.4000,
+    2.7920, 1.7928, 0.8438, 0.2547,
+    0.1321, 0.3965, 0.8573, 1.3069,
+    1.5952
+])
+
+# ==========================================
+# 2. MATRIZ PARA MINIMOS CUADRADOS
+# ==========================================
+
+Phi = []
+Y = []
+
+for k in range(1, len(y_real)):
+    y1 = y_real[k - 1]
+    y2 = y_real[k - 2] if k >= 2 else 0
+
+    x1 = x[k - 1]
+    x2 = x[k - 2] if k >= 2 else 0
+
+    Phi.append([y1, y2, x1, x2])
+    Y.append(y_real[k])
+
+Phi = np.array(Phi)
+Y = np.array(Y)
+
+# Calcular parametros
+a, b, c, d = np.linalg.lstsq(
+    Phi, Y, rcond=None
+)[0]
+
+print("PARAMETROS IDENTIFICADOS")
+print(f"a = {a:.6f}")
+print(f"b = {b:.6f}")
+print(f"c = {c:.6f}")
+print(f"d = {d:.6f}")
+
+print("\nECUACION DE DIFERENCIAS")
+print(
+    f"y[n] = ({a:.4f})y[n-1] "
+    f"+ ({b:.4f})y[n-2] "
+    f"+ ({c:.4f})x[n-1] "
+    f"+ ({d:.4f})x[n-2]"
+)
+
+# ==========================================
+# 3. RESPUESTA DE LA ECUACION DE DIFERENCIAS
+# ==========================================
+
+y_estimada = np.zeros(len(y_real))
+
+for k in range(1, len(y_real)):
+    y1 = y_estimada[k - 1]
+    y2 = y_estimada[k - 2] if k >= 2 else 0
+
+    x1 = x[k - 1]
+    x2 = x[k - 2] if k >= 2 else 0
+
+    y_estimada[k] = (
+        a * y1
+        + b * y2
+        + c * x1
+        + d * x2
+    )
+
+# ==========================================
+# 4. GRAFICA 1: ECUACION DE DIFERENCIAS
+# ==========================================
+
+plt.figure(figsize=(9, 5))
+plt.plot(n, y_estimada, 'o-', label='Respuesta calculada')
+plt.title('Grafica 1: Ecuacion de diferencias obtenida')
+plt.xlabel('Tiempo discreto n')
+plt.ylabel('Salida y[n]')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# ==========================================
+# 5. GRAFICA 2: RESPUESTA REAL
+# ==========================================
+
+plt.figure(figsize=(9, 5))
+plt.plot(n, y_real, 's-', label='Respuesta real')
+plt.title('Grafica 2: Respuesta original del sistema')
+plt.xlabel('Tiempo discreto n')
+plt.ylabel('Salida y[n]')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# ==========================================
+# 6. GRAFICA 3: COMPARACION
+# ==========================================
+
+plt.figure(figsize=(9, 5))
+plt.plot(n, y_real, 'o-', label='Respuesta real')
+plt.plot(n, y_estimada, 's--', label='Ecuacion de diferencias')
+plt.title('Grafica 3: Comparacion de respuestas')
+plt.xlabel('Tiempo discreto n')
+plt.ylabel('Salida y[n]')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+
+# Mostrar las tres graficas
+plt.show()
+```
